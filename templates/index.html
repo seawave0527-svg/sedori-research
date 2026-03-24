@@ -911,7 +911,7 @@
       tr.innerHTML =
         '<td data-label="\u5546\u54C1\u540D">'
           + '<div class="product-title">' + esc(item.title) + '</div>'
-          + '<div class="product-asin">ASIN: ' + esc(item.asin) + '</div>'
+          + '<div class="product-asin">ASIN: ' + esc(item.asin) + ' <button onclick="copyAsin(\'' + esc(item.asin) + '\', this)" style="font-size:10px;padding:1px 6px;background:#1e2d45;color:#00d4aa;border:1px solid #00d4aa;border-radius:3px;cursor:pointer;margin-left:4px;">コピー</button></div>'
         + '</td>'
         + '<td data-label="Amazon\u4FA1\u683C">'
           + '<div class="price-amazon">' + (item.amazon_price ? item.amazon_price.toLocaleString() + '\u5186' : '&#8212;') + '</div>'
@@ -933,6 +933,15 @@
         + '<td data-label="\u4ED5\u5165\u308C\u30EA\u30F3\u30AF">' + linkHtml + '</td>';
 
       tbody.appendChild(tr);
+    });
+  }
+
+  function copyAsin(asin, btn) {
+    navigator.clipboard.writeText(asin).then(() => {
+      btn.textContent = 'コピー済み';
+      btn.style.background = '#00d4aa';
+      btn.style.color = '#0a0e1a';
+      setTimeout(() => { btn.textContent = 'コピー'; btn.style.background = '#1e2d45'; btn.style.color = '#00d4aa'; }, 1500);
     });
   }
 
