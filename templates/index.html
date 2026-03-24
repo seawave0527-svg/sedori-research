@@ -3,677 +3,957 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>せどりリサーチツール</title>
+  <title>せどりリサーチツール | Keepa Premium Finder</title>
   <style>
-    /* ===== リセット & 変数 ===== */
+    /* ===== RESET & BASE ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0a0e1a;
-      --bg-card:   #0f1525;
-      --bg-input:  #141926;
-      --border:    #1e2d4a;
-      --accent:    #00d4aa;
-      --accent2:   #00a8ff;
-      --text:      #e0e6f0;
-      --muted:     #6b7c9e;
-      --green:     #00d4aa;
-      --yellow:    #f5c542;
-      --orange:    #ff9f43;
-      --red:       #ff4d6d;
-      --radius:    12px;
+      --bg:          #0a0e1a;
+      --bg2:         #111827;
+      --bg3:         #1a2235;
+      --border:      #1e2d45;
+      --accent:      #00d4aa;
+      --accent2:     #0099ff;
+      --accent3:     #7c3aed;
+      --text:        #e2e8f0;
+      --text-muted:  #64748b;
+      --success:     #10b981;
+      --warning:     #f59e0b;
+      --danger:      #ef4444;
+      --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
       min-height: 100vh;
+      line-height: 1.6;
     }
 
-    /* ===== ヘッダー ===== */
+    /* ===== HEADER ===== */
     header {
-      background: linear-gradient(135deg, #060d1f 0%, #0d1f3c 40%, #0a1a2e 70%, #050e1b 100%);
+      background: linear-gradient(135deg, #0a0e1a 0%, #111827 100%);
       border-bottom: 1px solid var(--border);
-      padding: 28px 24px 24px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+      padding: 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
     }
 
-    header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 80% at 20% 50%, rgba(0,212,170,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 80% at 80% 50%, rgba(0,168,255,0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .header-badge {
-      display: inline-flex;
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(0,212,170,0.1);
-      border: 1px solid rgba(0,212,170,0.3);
-      border-radius: 999px;
-      padding: 4px 14px;
-      font-size: 11px;
-      color: var(--accent);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 12px;
+      gap: 16px;
     }
 
-    .header-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    header h1 {
-      font-size: clamp(22px, 4vw, 36px);
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-size: 20px;
       font-weight: 700;
-      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
+      white-space: nowrap;
     }
 
-    header p {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
+    .logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: auto;
     }
 
-    /* ===== メインコンテンツ ===== */
+    /* ===== MAIN LAYOUT ===== */
     main {
-      max-width: 1100px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 32px 20px 60px;
+      padding: 32px 24px;
     }
 
-    /* ===== 検索カード ===== */
-    .search-card {
-      background: var(--bg-card);
+    /* ===== SEARCH PANEL ===== */
+    .search-panel {
+      background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 28px;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      box-shadow: var(--card-shadow);
     }
 
-    .search-card h2 {
+    .panel-title {
       font-size: 14px;
       font-weight: 600;
-      color: var(--muted);
+      color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 16px;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
     }
 
     .search-row {
       display: flex;
-      gap: 12px;
+      gap: 16px;
+      align-items: flex-end;
       flex-wrap: wrap;
     }
 
-    #keyword-input {
-      flex: 1;
-      min-width: 200px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    #keyword-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,212,170,0.12);
-    }
-
-    #keyword-input::placeholder { color: var(--muted); }
-
-    #search-btn {
-      background: linear-gradient(135deg, var(--accent) 0%, #00b894 100%);
-      color: #050e1b;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 28px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      white-space: nowrap;
-    }
-
-    #search-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-    #search-btn:active:not(:disabled) { transform: translateY(0); }
-    #search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* ===== ローディング ===== */
-    #loading {
-      display: none;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 40px 28px;
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    #loading.visible { display: block; }
-
-    .spinner {
-      width: 48px; height: 48px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    .loading-text {
-      font-size: 15px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .loading-sub {
-      font-size: 13px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
-      background-size: 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 2.5s linear infinite;
-    }
-
-    /* ===== エラー ===== */
-    #error-box {
-      display: none;
-      background: rgba(255,77,109,0.08);
-      border: 1px solid rgba(255,77,109,0.3);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      color: var(--red);
-      margin-bottom: 28px;
-      font-size: 14px;
-    }
-
-    #error-box.visible { display: block; }
-
-    /* ===== 結果エリア ===== */
-    #results-area { display: none; }
-    #results-area.visible { display: block; }
-
-    .results-header {
+    .form-group {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .results-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .results-meta {
+    .form-group label {
       font-size: 12px;
-      color: var(--muted);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .keyword-tag {
-      display: inline-block;
-      background: rgba(0,212,170,0.12);
-      border: 1px solid rgba(0,212,170,0.3);
-      color: var(--accent);
-      border-radius: 999px;
-      padding: 2px 12px;
-      font-size: 13px;
-      margin-left: 8px;
-    }
-
-    /* ===== サマリーバー ===== */
-    .summary-bar {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .summary-chip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-card);
+    .form-group select,
+    .form-group input {
+      background: var(--bg3);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 8px 14px;
-      font-size: 13px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 160px;
     }
 
-    .chip-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
+    .form-group select:focus,
+    .form-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,212,170,0.1);
     }
 
-    .dot-green  { background: var(--green); }
-    .dot-yellow { background: var(--yellow); }
-    .dot-orange { background: var(--orange); }
-    .dot-red    { background: var(--red); }
+    .form-group select option {
+      background: var(--bg3);
+    }
 
-    /* ===== テーブル ===== */
-    .table-wrap {
-      background: var(--bg-card);
+    .btn-research {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 10px;
+      color: #0a0e1a;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 11px 32px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-research:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(0,212,170,0.35);
+    }
+
+    .btn-research:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-research:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* ===== LOADING ===== */
+    .loading-panel {
+      display: none;
+      background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      margin-bottom: 32px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .loading-panel.visible { display: block; }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .loading-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg3);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .loading-step.active {
+      color: var(--accent);
+      border-color: rgba(0,212,170,0.3);
+      background: rgba(0,212,170,0.05);
+    }
+
+    .loading-step.done {
+      color: var(--success);
+    }
+
+    .step-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .loading-step.active .step-icon {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stats-bar.visible { display: grid; }
+
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== RESULTS TABLE ===== */
+    .results-section {
+      display: none;
+    }
+
+    .results-section.visible { display: block; }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .results-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .results-count {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .table-wrapper {
       overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
-      min-width: 720px;
+    }
+
+    thead {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
     }
 
     thead th {
-      background: #0c1320;
-      padding: 12px 14px;
+      padding: 14px 16px;
       text-align: left;
       font-size: 11px;
       font-weight: 600;
-      color: var(--muted);
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.5px;
       white-space: nowrap;
     }
 
-    thead th.num { text-align: right; }
-
     tbody tr {
-      border-bottom: 1px solid rgba(30,45,74,0.6);
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
       transition: background 0.15s;
     }
 
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(0,212,170,0.04); }
+
+    tbody tr:hover { background: var(--bg3); }
 
     tbody td {
-      padding: 12px 14px;
+      padding: 14px 16px;
       vertical-align: middle;
     }
 
-    tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .product-title {
+      max-width: 260px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+    }
 
-    .site-badge {
-      display: inline-block;
-      background: rgba(0,168,255,0.1);
-      border: 1px solid rgba(0,168,255,0.25);
-      color: var(--accent2);
-      border-radius: 6px;
-      padding: 2px 8px;
-      font-size: 11px;
+    .product-asin {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: monospace;
+      margin-top: 2px;
+    }
+
+    .price-amazon {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ff6b6b;
       white-space: nowrap;
     }
 
-    .item-name {
-      color: var(--text);
-      max-width: 260px;
+    .price-list {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      white-space: nowrap;
     }
 
-    .mock-tag {
+    .price-diff-badge {
       display: inline-block;
-      background: rgba(107,124,158,0.15);
-      border: 1px solid rgba(107,124,158,0.3);
-      color: var(--muted);
+      background: rgba(255,107,107,0.15);
+      color: #ff6b6b;
       border-radius: 4px;
-      padding: 1px 5px;
+      padding: 1px 6px;
       font-size: 10px;
-      margin-left: 4px;
-      vertical-align: middle;
+      font-weight: 600;
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+
+    .price-buy {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .source-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    .source-rakuten {
+      background: rgba(187,0,0,0.15);
+      color: #ff6b6b;
+    }
+
+    .source-yahoo {
+      background: rgba(255,0,128,0.15);
+      color: #ff69b4;
+    }
+
+    .profit-positive {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--success);
+      white-space: nowrap;
+    }
+
+    .profit-negative {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--danger);
+      white-space: nowrap;
+    }
+
+    .profit-rate-wrapper {
+      min-width: 120px;
+    }
+
+    .profit-rate-value {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .profit-rate-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .profit-rate-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .grade {
+      font-size: 22px;
+      text-align: center;
+    }
+
+    .btn-buy {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .grade-S  { background: rgba(0,212,170,0.15);  color: var(--green);  border: 1px solid rgba(0,212,170,0.35); }
-    .grade-A  { background: rgba(245,197,66,0.12);  color: var(--yellow); border: 1px solid rgba(245,197,66,0.3); }
-    .grade-B  { background: rgba(255,159,67,0.12);  color: var(--orange); border: 1px solid rgba(255,159,67,0.3); }
-    .grade-C  { background: rgba(255,77,109,0.12); color: var(--red);    border: 1px solid rgba(255,77,109,0.3); }
-
-    .profit-pos { color: var(--green);  font-weight: 600; }
-    .profit-neg { color: var(--red);    font-weight: 600; }
-
-    .bar-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .bar-bg {
-      width: 80px; height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.6s ease;
-    }
-
-    .bar-green  { background: linear-gradient(90deg, var(--accent), #00b894); }
-    .bar-yellow { background: linear-gradient(90deg, var(--yellow), #e0ae30); }
-    .bar-orange { background: linear-gradient(90deg, var(--orange), #e08030); }
-    .bar-red    { background: linear-gradient(90deg, var(--red), #c0304d); }
-
-    /* ===== アニメーション ===== */
-    @keyframes spin    { to { transform: rotate(360deg); } }
-    @keyframes pulse   { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-    @keyframes shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    tbody tr { animation: fadeInUp 0.3s ease both; }
-
-    /* ===== フッター ===== */
-    footer {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
+      gap: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 7px;
+      color: #0a0e1a;
+      cursor: pointer;
       font-size: 12px;
-      border-top: 1px solid var(--border);
+      font-weight: 700;
+      padding: 7px 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
 
-    /* ===== レスポンシブ ===== */
-    @media (max-width: 600px) {
-      .search-row { flex-direction: column; }
-      #search-btn { width: 100%; }
+    .btn-buy:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,212,170,0.4);
     }
+
+    .btn-buy-disabled {
+      background: var(--bg3);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 12px;
+      padding: 7px 14px;
+      cursor: default;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    /* ===== MESSAGE / ERROR ===== */
+    .message-panel {
+      display: none;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .message-panel.visible { display: block; }
+    .message-panel.error { border-color: rgba(239,68,68,0.4); }
+
+    .message-icon { font-size: 40px; margin-bottom: 12px; }
+    .message-text { color: var(--text-muted); font-size: 14px; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      main { padding: 20px 16px; }
+      .search-panel { padding: 20px; }
+      .search-row { flex-direction: column; }
+      .search-row > * { width: 100%; }
+      .btn-research { width: 100%; text-align: center; }
+      .form-group select,
+      .form-group input { width: 100%; min-width: unset; }
+
+      thead { display: none; }
+
+      tbody tr {
+        display: block;
+        padding: 12px 16px;
+      }
+
+      tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: none;
+      }
+
+      tbody td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        flex-shrink: 0;
+        margin-right: 12px;
+      }
+
+      .product-title { max-width: 200px; text-align: right; }
+      .table-wrapper { border-radius: 12px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .logo-sub { display: none; }
+    }
+
+    .table-wrapper::-webkit-scrollbar { height: 6px; }
+    .table-wrapper::-webkit-scrollbar-track { background: var(--bg2); }
+    .table-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="header-badge">AI-Powered Research</div>
-  <h1>せどりリサーチツール</h1>
-  <p>Claude A（仕入れリサーチ）× Claude B（利益分析）連携システム</p>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">&#128200;</div>
+      <span class="logo-text">Sedori Research</span>
+    </div>
+    <span class="logo-sub">Powered by Keepa API</span>
+  </div>
 </header>
 
 <main>
 
-  <!-- 検索カード -->
-  <div class="search-card">
-    <h2>キーワード検索</h2>
+  <!-- 検索パネル -->
+  <div class="search-panel">
+    <div class="panel-title">&#9881; リサーチ設定</div>
     <div class="search-row">
-      <input
-        id="keyword-input"
-        type="text"
-        placeholder="例: Nintendo Switch、ゲームボーイ、SONY ヘッドフォン..."
-        autocomplete="off"
-      />
-      <button id="search-btn">リサーチ開始</button>
+      <div class="form-group">
+        <label>カテゴリ</label>
+        <select id="categorySelect">
+          <option value="other">すべて（その他）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>取得件数</label>
+        <select id="limitSelect">
+          <option value="10">10 件</option>
+          <option value="20" selected>20 件</option>
+          <option value="30">30 件</option>
+          <option value="50">50 件</option>
+        </select>
+      </div>
+      <div class="form-group" style="flex:1; min-width:160px;"></div>
+      <button class="btn-research" id="researchBtn" onclick="startResearch()">
+        &#128270; リサーチ開始
+      </button>
     </div>
   </div>
 
   <!-- ローディング -->
-  <div id="loading">
-    <div class="spinner"></div>
-    <div class="loading-text">各仕入れサイトをスキャン中...</div>
-    <div class="loading-sub" id="loading-sub">Claude A・Claude B が連携してリサーチ中...</div>
+  <div class="loading-panel" id="loadingPanel">
+    <div class="loading-spinner"></div>
+    <div style="font-size:16px; font-weight:700; color:var(--accent); margin-bottom:8px;">
+      プレミアム商品を探索中...
+    </div>
+    <div style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+      しばらくお待ちください
+    </div>
+    <div class="loading-steps">
+      <div class="loading-step" id="step1">
+        <span class="step-icon">&#128272;</span>
+        <span>Keepaで定価超え商品を探索中...</span>
+      </div>
+      <div class="loading-step" id="step2">
+        <span class="step-icon">&#127981;</span>
+        <span>楽天市場で価格調査中...</span>
+      </div>
+      <div class="loading-step" id="step3">
+        <span class="step-icon">&#128722;</span>
+        <span>Yahoo!ショッピングで価格調査中...</span>
+      </div>
+      <div class="loading-step" id="step4">
+        <span class="step-icon">&#128202;</span>
+        <span>利益計算・分析中...</span>
+      </div>
+    </div>
   </div>
 
-  <!-- エラー -->
-  <div id="error-box"></div>
+  <!-- エラー / メッセージ -->
+  <div class="message-panel" id="messagePanel">
+    <div class="message-icon" id="messageIcon">&#9888;&#65039;</div>
+    <div class="message-text" id="messageText"></div>
+  </div>
 
-  <!-- 結果エリア -->
-  <div id="results-area">
-
-    <div class="results-header">
-      <div class="results-title">
-        リサーチ結果
-        <span class="keyword-tag" id="result-keyword"></span>
-      </div>
-      <div class="results-meta" id="result-count"></div>
+  <!-- 統計バー -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-label">取得商品数</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statExcellent">0</div>
+      <div class="stat-label">高利益（&#9670;）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statOk">0</div>
+      <div class="stat-label">利益あり（&#9675;）</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statBestRate">-</div>
+      <div class="stat-label">最高利益率</div>
+    </div>
+  </div>
 
-    <!-- サマリーバー -->
-    <div class="summary-bar" id="summary-bar"></div>
-
-    <!-- テーブル -->
-    <div class="table-wrap">
+  <!-- 結果テーブル -->
+  <div class="results-section" id="resultsSection">
+    <div class="results-header">
+      <div class="results-title">&#128200; リサーチ結果</div>
+      <div class="results-count" id="resultsCount"></div>
+    </div>
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
-            <th>評価</th>
-            <th>仕入れサイト</th>
             <th>商品名</th>
-            <th class="num">仕入れ値</th>
-            <th class="num">Amazon価格</th>
-            <th class="num">手数料</th>
-            <th class="num">利益</th>
-            <th class="num">利益率</th>
+            <th>Amazon価格</th>
+            <th>定価（参考）</th>
+            <th>最安仕入れ先</th>
+            <th>仕入れ値</th>
+            <th>利益</th>
+            <th>利益率</th>
+            <th>評価</th>
+            <th>仕入れリンク</th>
           </tr>
         </thead>
-        <tbody id="results-body"></tbody>
+        <tbody id="resultsBody"></tbody>
       </table>
     </div>
+  </div>
 
-  </div><!-- /results-area -->
+  <!-- 初期状態 -->
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">&#128200;</div>
+    <div style="font-size:16px; font-weight:600; margin-bottom:8px; color:var(--text);">
+      カテゴリを選んでリサーチを開始
+    </div>
+    <div style="font-size:13px;">
+      Keepa APIで定価より高く売られているAmazon商品を自動検出し<br>
+      楽天・Yahoo!ショッピングで安く仕入れられるか調べます
+    </div>
+  </div>
 
 </main>
 
-<footer>
-  &copy; 2026 せどりリサーチツール &nbsp;|&nbsp;
-  Claude A（仕入れリサーチ）× Claude B（利益分析）&nbsp;|&nbsp;
-  手数料: Amazon販売手数料15% + FBA配送料¥300
-</footer>
-
 <script>
-  const keywordInput = document.getElementById('keyword-input');
-  const searchBtn    = document.getElementById('search-btn');
-  const loading      = document.getElementById('loading');
-  const loadingSub   = document.getElementById('loading-sub');
-  const errorBox     = document.getElementById('error-box');
-  const resultsArea  = document.getElementById('results-area');
-  const resultKeyword= document.getElementById('result-keyword');
-  const resultCount  = document.getElementById('result-count');
-  const summaryBar   = document.getElementById('summary-bar');
-  const resultsBody  = document.getElementById('results-body');
-
-  // ローディングメッセージのローテーション
-  const loadingMessages = [
-    'Claude A・Claude B が連携してリサーチ中...',
-    'Claude A: メルカリ・ヤフオク・Yahoo!フリマをスキャン中...',
-    'Claude A: オフモール・セカンドストリート・トレファクを調査中...',
-    'Claude B: Amazon価格を取得中...',
-    'Claude B: 利益率を計算・ランキング中...',
-    'リサーチ結果を集計しています...',
-  ];
-  let loadingIdx = 0;
-  let loadingTimer = null;
-
-  function startLoadingAnim() {
-    loadingIdx = 0;
-    loadingSub.textContent = loadingMessages[0];
-    loadingTimer = setInterval(() => {
-      loadingIdx = (loadingIdx + 1) % loadingMessages.length;
-      loadingSub.textContent = loadingMessages[loadingIdx];
-    }, 2200);
-  }
-
-  function stopLoadingAnim() {
-    clearInterval(loadingTimer);
-  }
-
-  function setLoading(on) {
-    if (on) {
-      loading.classList.add('visible');
-      errorBox.classList.remove('visible');
-      resultsArea.classList.remove('visible');
-      searchBtn.disabled = true;
-      keywordInput.disabled = true;
-      startLoadingAnim();
-    } else {
-      loading.classList.remove('visible');
-      searchBtn.disabled = false;
-      keywordInput.disabled = false;
-      stopLoadingAnim();
+  // ===== カテゴリ読み込み =====
+  async function loadCategories() {
+    try {
+      const res = await fetch('/api/categories');
+      const data = await res.json();
+      const select = document.getElementById('categorySelect');
+      select.innerHTML = '';
+      data.categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = cat.name;
+        if (cat.id === 'other') opt.selected = true;
+        select.appendChild(opt);
+      });
+    } catch (e) {
+      console.error('カテゴリ読み込みエラー:', e);
     }
   }
 
-  function showError(msg) {
-    errorBox.textContent = msg;
-    errorBox.classList.add('visible');
+  // ===== ローディングステップアニメーション =====
+  let stepTimer = null;
+  const STEP_IDS = ['step1','step2','step3','step4'];
+
+  function animateSteps() {
+    let current = 0;
+    STEP_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('active','done');
+      el.querySelector('.step-icon').textContent = el.dataset.icon;
+    });
+    document.getElementById(STEP_IDS[0]).classList.add('active');
+
+    stepTimer = setInterval(() => {
+      if (current < STEP_IDS.length - 1) {
+        const prev = document.getElementById(STEP_IDS[current]);
+        prev.classList.remove('active');
+        prev.classList.add('done');
+        prev.querySelector('.step-icon').textContent = '&#10003;';
+        current++;
+        document.getElementById(STEP_IDS[current]).classList.add('active');
+      }
+    }, 4000);
   }
 
-  // グレード → クラス・ラベル変換
-  function gradeInfo(grade) {
-    switch(grade) {
-      case '◎': return { cls: 'grade-S', label: '◎', barCls: 'bar-green',  dotCls: 'dot-green' };
-      case '○': return { cls: 'grade-A', label: '○', barCls: 'bar-yellow', dotCls: 'dot-yellow' };
-      case '△': return { cls: 'grade-B', label: '△', barCls: 'bar-orange', dotCls: 'dot-orange' };
-      default:   return { cls: 'grade-C', label: '✗', barCls: 'bar-red',    dotCls: 'dot-red' };
-    }
+  function stopStepAnimation() {
+    if (stepTimer) { clearInterval(stepTimer); stepTimer = null; }
+    STEP_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('active');
+      el.classList.add('done');
+    });
   }
 
-  function fmt(n) {
-    return Number(n).toLocaleString('ja-JP');
+  // ===== UI ヘルパー =====
+  function showLoading() {
+    document.getElementById('loadingPanel').classList.add('visible');
+    document.getElementById('messagePanel').classList.remove('visible');
+    document.getElementById('statsBar').classList.remove('visible');
+    document.getElementById('resultsSection').classList.remove('visible');
+    document.getElementById('emptyState').style.display = 'none';
   }
 
-  function renderResults(keyword, results) {
-    resultKeyword.textContent = keyword;
-    resultCount.textContent   = `${results.length} 件`;
-
-    // サマリー集計
-    const counts = { '◎': 0, '○': 0, '△': 0, '✗': 0 };
-    results.forEach(r => { counts[r.grade] = (counts[r.grade] || 0) + 1; });
-
-    const chipDefs = [
-      { grade: '◎', label: '◎ 優良',  dotCls: 'dot-green' },
-      { grade: '○', label: '○ 良好',  dotCls: 'dot-yellow' },
-      { grade: '△', label: '△ トントン', dotCls: 'dot-orange' },
-      { grade: '✗', label: '✗ 赤字',  dotCls: 'dot-red' },
-    ];
-    summaryBar.innerHTML = chipDefs.map(c => `
-      <div class="summary-chip">
-        <span class="chip-dot ${c.dotCls}"></span>
-        ${c.label}: ${counts[c.grade] || 0}件
-      </div>
-    `).join('');
-
-    // テーブル行
-    const maxRate = Math.max(...results.map(r => Math.abs(r.profit_rate)), 1);
-
-    resultsBody.innerHTML = results.map((r, i) => {
-      const gi = gradeInfo(r.grade);
-      const profitCls = r.profit >= 0 ? 'profit-pos' : 'profit-neg';
-      const profitSign = r.profit >= 0 ? '+' : '';
-      const barW = Math.min(Math.abs(r.profit_rate) / maxRate * 100, 100).toFixed(1);
-      const mockTag = r.is_mock ? '<span class="mock-tag">モック</span>' : '';
-      const delay = (i * 40) + 'ms';
-
-      return `
-        <tr style="animation-delay:${delay}">
-          <td><span class="grade ${gi.cls}">${gi.label}</span></td>
-          <td><span class="site-badge">${r.site}</span></td>
-          <td class="item-name">${escHtml(r.name)}${mockTag}</td>
-          <td class="num">¥${fmt(r.buy_price)}</td>
-          <td class="num">¥${fmt(r.amazon_price)}</td>
-          <td class="num">¥${fmt(r.fee)}</td>
-          <td class="num ${profitCls}">${profitSign}¥${fmt(r.profit)}</td>
-          <td class="num">
-            <div class="bar-wrap">
-              <div class="bar-bg">
-                <div class="bar-fill ${gi.barCls}" style="width:${barW}%"></div>
-              </div>
-              <span class="${profitCls}">${r.profit_rate.toFixed(1)}%</span>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    resultsArea.classList.add('visible');
+  function hideLoading() {
+    document.getElementById('loadingPanel').classList.remove('visible');
   }
 
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+  function showMessage(text, isError) {
+    const panel = document.getElementById('messagePanel');
+    panel.className = 'message-panel visible' + (isError ? ' error' : '');
+    document.getElementById('messageIcon').textContent = isError ? '\u26A0\uFE0F' : '\u2139\uFE0F';
+    document.getElementById('messageText').textContent = text;
   }
 
-  async function doSearch() {
-    const keyword = keywordInput.value.trim();
-    if (!keyword) {
-      keywordInput.focus();
-      return;
-    }
+  // ===== リサーチ実行 =====
+  async function startResearch() {
+    const category = document.getElementById('categorySelect').value;
+    const limit    = parseInt(document.getElementById('limitSelect').value);
+    const btn      = document.getElementById('researchBtn');
 
-    setLoading(true);
+    btn.disabled = true;
+    btn.textContent = '\u{1F504} リサーチ中...';
+
+    showLoading();
+    animateSteps();
 
     try {
-      const res = await fetch('/api/search', {
-        method: 'POST',
+      const res = await fetch('/api/research', {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ keyword }),
+        body:    JSON.stringify({ category, limit }),
       });
 
-      const data = await res.json();
+      stopStepAnimation();
 
       if (!res.ok) {
-        showError(data.error || 'APIエラーが発生しました');
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'HTTPエラー ' + res.status);
+      }
+
+      const data = await res.json();
+      hideLoading();
+
+      if (data.status === 'error') {
+        showMessage(data.message || 'エラーが発生しました', true);
         return;
       }
 
       if (!data.results || data.results.length === 0) {
-        showError('検索結果が0件でした。キーワードを変えて再試行してください。');
+        showMessage(data.message || '条件に合う商品が見つかりませんでした。カテゴリを変えて再試行してください。', false);
         return;
       }
 
-      renderResults(data.keyword, data.results);
+      renderResults(data.results);
 
-    } catch (err) {
-      showError('通信エラーが発生しました: ' + err.message);
+    } catch (e) {
+      stopStepAnimation();
+      hideLoading();
+      showMessage('エラー: ' + e.message, true);
+      console.error(e);
     } finally {
-      setLoading(false);
+      btn.disabled = false;
+      btn.textContent = '\u{1F50D} リサーチ開始';
     }
   }
 
-  searchBtn.addEventListener('click', doSearch);
-  keywordInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') doSearch();
+  // ===== 結果レンダリング =====
+  function renderResults(results) {
+    const total     = results.length;
+    const excellent = results.filter(r => r.grade === '\u25CE').length;
+    const ok        = results.filter(r => r.grade === '\u25CB').length;
+    const rates     = results.map(r => r.profit_rate).filter(r => r !== null && r !== undefined);
+    const bestRate  = rates.length > 0 ? Math.max(...rates) : null;
+
+    document.getElementById('statTotal').textContent     = total;
+    document.getElementById('statExcellent').textContent = excellent;
+    document.getElementById('statOk').textContent        = ok;
+    document.getElementById('statBestRate').textContent  = bestRate !== null ? bestRate.toFixed(1) + '%' : '-';
+    document.getElementById('statsBar').classList.add('visible');
+    document.getElementById('resultsCount').textContent  = total + ' 件の商品';
+    document.getElementById('resultsSection').classList.add('visible');
+
+    const tbody = document.getElementById('resultsBody');
+    tbody.innerHTML = '';
+
+    results.forEach(item => {
+      const tr = document.createElement('tr');
+      const rate = item.profit_rate;
+
+      let barColor = 'var(--danger)';
+      if (rate >= 15) barColor = 'var(--accent)';
+      else if (rate >= 5) barColor = 'var(--warning)';
+
+      const barWidth = rate !== null && rate !== undefined
+        ? Math.min(Math.max(rate, 0), 100) : 0;
+
+      // 仕入れ先バッジ
+      let sourceBadge = '<span style="color:var(--text-muted)">&#8212;</span>';
+      if (item.buy_source) {
+        const cls = item.buy_source.includes('\u697D\u5929') ? 'source-rakuten' : 'source-yahoo';
+        sourceBadge = '<span class="source-badge ' + cls + '">' + esc(item.buy_source) + '</span>';
+      }
+
+      // 利益表示
+      const profitHtml = item.profit !== null && item.profit !== undefined
+        ? '<span class="' + (item.profit >= 0 ? 'profit-positive' : 'profit-negative') + '">'
+          + (item.profit >= 0 ? '+' : '') + item.profit.toLocaleString() + '\u5186</span>'
+        : '<span style="color:var(--text-muted)">&#8212;</span>';
+
+      // 利益率バー
+      const rateHtml = rate !== null && rate !== undefined
+        ? '<div class="profit-rate-wrapper">'
+          + '<div class="profit-rate-value" style="color:' + barColor + '">' + rate.toFixed(1) + '%</div>'
+          + '<div class="profit-rate-bar-bg"><div class="profit-rate-bar-fill" style="width:' + barWidth + '%;background:' + barColor + ';"></div></div>'
+          + '</div>'
+        : '<span style="color:var(--text-muted)">&#8212;</span>';
+
+      // 仕入れリンク
+      const linkHtml = item.buy_url
+        ? '<a class="btn-buy" href="' + esc(item.buy_url) + '" target="_blank" rel="noopener">&#128722; \u4ED5\u5165\u308C\u308B</a>'
+        : '<span class="btn-buy-disabled">\u30EA\u30F3\u30AF\u306A\u3057</span>';
+
+      const shopName = item.buy_shop ? esc(item.buy_shop).substring(0, 20) : '';
+
+      tr.innerHTML =
+        '<td data-label="\u5546\u54C1\u540D">'
+          + '<div class="product-title">' + esc(item.title) + '</div>'
+          + '<div class="product-asin">ASIN: ' + esc(item.asin) + '</div>'
+        + '</td>'
+        + '<td data-label="Amazon\u4FA1\u683C">'
+          + '<div class="price-amazon">' + (item.amazon_price ? item.amazon_price.toLocaleString() + '\u5186' : '&#8212;') + '</div>'
+          + '<span class="price-diff-badge">+' + (item.price_diff_rate || 0).toFixed(1) + '%</span>'
+        + '</td>'
+        + '<td data-label="\u5B9A\u4FA1">'
+          + '<div class="price-list">' + (item.list_price ? item.list_price.toLocaleString() + '\u5186' : '&#8212;') + '</div>'
+        + '</td>'
+        + '<td data-label="\u4ED5\u5165\u308C\u5148">'
+          + sourceBadge
+          + (shopName ? '<div style="font-size:11px;color:var(--text-muted);margin-top:3px;">' + shopName + '</div>' : '')
+        + '</td>'
+        + '<td data-label="\u4ED5\u5165\u308C\u5024">'
+          + '<div class="price-buy">' + (item.buy_price ? item.buy_price.toLocaleString() + '\u5186' : '&#8212;') + '</div>'
+        + '</td>'
+        + '<td data-label="\u5229\u76CA">' + profitHtml + '</td>'
+        + '<td data-label="\u5229\u76CA\u7387">' + rateHtml + '</td>'
+        + '<td data-label="\u8A55\u4FA1"><span class="grade">' + (item.grade || '?') + '</span></td>'
+        + '<td data-label="\u4ED5\u5165\u308C\u30EA\u30F3\u30AF">' + linkHtml + '</td>';
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  // ===== 初期化 =====
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCategories();
+    // step-iconにdata属性でオリジナルアイコンを保存
+    document.querySelectorAll('.loading-step').forEach(el => {
+      el.dataset.icon = el.querySelector('.step-icon').textContent;
+    });
   });
 </script>
-
 </body>
 </html>
