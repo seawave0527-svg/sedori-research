@@ -266,12 +266,20 @@ def _extract_price(text):
     """テキストから価格（数値）を抽出する。"""
     if not text:
         return None
-    # カンマ・円記号・スペースを除去して数値を抽出
-    cleaned = re.sub(r"[^\d,]", "", text.replace(",", ""))
-    digits = re.search(r"\d+", cleaned)
-    if digits:
-        val = int(digits.group())
-        # 妥当な価格範囲チェック（1円〜100万円）
-        if 1 <= val <= 1_000_000:
-            return val
+    # 「¥1,234」「1,234円」「1234円」のパターンを優先して探す
+    patterns = [
+        r"[¥￥]\s*([\d,]+)",       # ¥1,234
+        r"([\d,]+)\s*円",          # 1,234円
+        r"([\d]{3,})",             # 3桁以上の数字
+    ]
+    for pattern in patterns:
+        m = re.search(pattern, text)
+        if m:
+            val_str = m.group(1).replace(",", "")
+            try:
+                val = int(val_str)
+                if 100 <= val <= 1_000_000:
+                    return val
+            except ValueError:
+                continue
     return None

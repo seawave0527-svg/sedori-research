@@ -702,7 +702,7 @@
             <th>利益</th>
             <th>利益率</th>
             <th>評価</th>
-            <th>仕入れリンク</th>
+            <th>リンク</th>
           </tr>
         </thead>
         <tbody id="resultsBody"></tbody>
@@ -901,10 +901,14 @@
           + '</div>'
         : '<span style="color:var(--text-muted)">&#8212;</span>';
 
-      // 仕入れリンク
-      const linkHtml = item.buy_url
+      // 仕入れリンク + Amazonリンク
+      const buyLinkHtml = item.buy_url
         ? '<a class="btn-buy" href="' + esc(item.buy_url) + '" target="_blank" rel="noopener">&#128722; \u4ED5\u5165\u308C\u308B</a>'
         : '<span class="btn-buy-disabled">\u30EA\u30F3\u30AF\u306A\u3057</span>';
+      const amazonLinkHtml = item.amazon_url
+        ? '<a class="btn-buy" href="' + esc(item.amazon_url) + '" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#ff9900,#ff6600);margin-top:4px;display:inline-flex;">&#128274; Amazon</a>'
+        : '';
+      const linkHtml = '<div style="display:flex;flex-direction:column;gap:4px;">' + buyLinkHtml + amazonLinkHtml + '</div>';
 
       const shopName = item.buy_shop ? esc(item.buy_shop).substring(0, 20) : '';
 
