@@ -7,6 +7,7 @@ Keepa APIで定価超え商品を取得し、楽天・Yahooで仕入れ価格を
 
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
@@ -104,39 +105,42 @@ def research():
                 "message":  "Keepaで定価超え商品が見つかりませんでした。",
             })
 
-        # Step 2: 各商品を楽天・Yahooで検索（キーワードはタイトルの先頭部分）
+        # Step 2: 各商品を楽天・Yahooで並列検索
         rakuten_results_map = {}
         yahoo_results_map   = {}
 
-        for i, product in enumerate(premium_products):
+        def fetch_rakuten(product):
             asin    = product["asin"]
-            title   = product["title"]
-            # タイトルが長い場合は先頭の重要部分だけを使う
-            keyword = _make_search_keyword(title)
-
-            print(f"[API] ({i+1}/{len(premium_products)}) 「{keyword}」を検索中...")
-
-            # 楽天検索
+            keyword = _make_search_keyword(product["title"])
             try:
-                r_results = rakuten_search(keyword, limit=5)
-                rakuten_results_map[asin] = r_results
-                print(f"  楽天: {len(r_results)} 件")
+                results = rakuten_search(keyword, limit=5)
+                print(f"  [楽天] {keyword[:20]}... → {len(results)}件")
+                return asin, results
             except Exception as e:
-                print(f"  楽天エラー: {e}")
-                rakuten_results_map[asin] = []
+                print(f"  [楽天エラー] {e}")
+                return asin, []
 
-            # Yahoo!ショッピング検索
+        def fetch_yahoo(product):
+            asin    = product["asin"]
+            keyword = _make_search_keyword(product["title"])
             try:
-                y_results = yahoo_search(keyword, limit=5)
-                yahoo_results_map[asin] = y_results
-                print(f"  Yahoo: {len(y_results)} 件")
+                results = yahoo_search(keyword, limit=5)
+                print(f"  [Yahoo] {keyword[:20]}... → {len(results)}件")
+                return asin, results
             except Exception as e:
-                print(f"  Yahooエラー: {e}")
-                yahoo_results_map[asin] = []
+                print(f"  [Yahooエラー] {e}")
+                return asin, []
 
-            # API過負荷防止のため少し待機
-            if i < len(premium_products) - 1:
-                time.sleep(0.5)
+        print(f"[API] {len(premium_products)}件を並列検索中...")
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            r_futures = {executor.submit(fetch_rakuten, p): p for p in premium_products}
+            y_futures = {executor.submit(fetch_yahoo,   p): p for p in premium_products}
+            for f in as_completed(r_futures):
+                asin, results = f.result()
+                rakuten_results_map[asin] = results
+            for f in as_completed(y_futures):
+                asin, results = f.result()
+                yahoo_results_map[asin] = results
 
         # Step 3: 利益計算
         print("[API] 利益計算中...")
